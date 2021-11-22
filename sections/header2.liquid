@@ -1,0 +1,321 @@
+<link rel="stylesheet" href="{{ 'header2.css' | asset_url }}">
+<script src="{{ 'header2.js' | asset_url }}" defer="defer"></script>
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <a href="{{ routes.root_url }}" class="navbar-brand">
+            {%- if section.settings.logo != blank -%}
+              {%- assign image_size = section.settings.logo_width | append: 'x' -%}
+              <img srcset="{{ section.settings.logo | img_url: image_size }} 1x, {{ section.settings.logo | img_url: image_size, scale: 2 }} 2x"
+                src="{{ section.settings.logo | img_url: image_size }}"
+                loading="lazy"
+                class="header__heading-logo"
+                width="{{ section.settings.logo.width }}"
+                height="{{ section.settings.logo.height }}"
+                alt="{{ section.settings.logo.alt | default: shop.name | escape }}"
+              >
+            {%- else -%}
+              <span class="h2">{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            
+            {%- if section.settings.menu != blank -%}
+                <ul class="navbar-nav {{ section.settings.menu_position }}-auto mb-2 mb-lg-0">
+                    {%- for link in section.settings.menu.links -%}
+                        {%- if link.links == blank -%}
+                            <li class="nav-item">
+                                <a class="nav-link {% if link.current %}active{% endif %}"{% if childlink.current %} aria-current="page"{% endif %} href="{{ link.url }}">{{ link.title }}</a>
+                            </li>
+                        {%- else -%}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {%- if link.child_active %} active {% endif %}" href="{{ link.url }}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ link.title }}
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    {%- for childlink in link.links -%}
+                                        {% if childlink.links == blank -%}
+                                            <li>
+                                                <a class="dropdown-item {% if childlink.current %}active{% endif %}"{% if childlink.current %} aria-current="page"{% endif %} href="{{ childlink.url }}">{{ childlink.title }}</a>
+                                            </li>
+                                        {%- else -%}
+                                            <li class="sub-nav-item-dropdown">
+                                                <a class="dropdown-item {%- if childlink.grandchild_active %} active {% endif %}" href="{{ childlink.url }}">{{ childlink.title }}</a>
+                                                <ul class="sub-dropdown-menu">
+                                                    {%- for grandchildlink in childlink.links -%}
+                                                        <li>
+                                                            <a class="dropdown-item {% if grandchildlink.current %} list-menu__item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %} href="{{ grandchildlink.url }}">{{ grandchildlink.title }}</a>
+                                                        </li>
+                                                    {%- endfor -%}
+                                                </ul>
+                                            </li>
+                                        {%- endif -%}
+                                    {%- endfor -%}
+                                </ul>
+                            </li>
+                        {%- endif -%}
+                    {%- endfor -%}
+                </ul>
+            {%- endif -%}
+
+            <div class="menu_right d-flex align-items-center">
+
+              <div class="cancel-icon">
+                <svg class="icon icon-close" aria-hidden="true" focusable="false" role="presentation">
+                  <use href="#icon-close">
+                </svg>
+              </div>
+
+              <div class="search-icon">
+                <svg class="icon icon-search" aria-hidden="true" focusable="false" role="presentation">
+                  <use href="#icon-search">
+                </svg>
+              </div>
+
+              <div class="form-wrapper">
+                {%- if settings.predictive_search_enabled -%}
+                  <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+                {%- endif -%}
+                <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+                  <div class="field">
+                    <input class="search__input field__input"
+                      id="Search-In-Modal"
+                      type="search"
+                      name="q"
+                      value=""
+                      placeholder="{{ 'general.search.search' | t }}"
+                      {%- if settings.predictive_search_enabled -%}
+                        role="combobox"
+                        aria-expanded="false"
+                        aria-owns="predictive-search-results-list"
+                        aria-controls="predictive-search-results-list"
+                        aria-haspopup="listbox"
+                        aria-autocomplete="list"
+                        autocorrect="off"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                      {%- endif -%}
+                    >
+                    <label class="field__label" for="Search-In-Modal">{{ 'general.search.search' | t }}</label>
+                    <input type="hidden" name="options[prefix]" value="last">
+                    <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+                      <svg class="icon icon-search" aria-hidden="true" focusable="false" role="presentation">
+                        <use href="#icon-search">
+                      </svg>
+                    </button>
+                  </div>
+
+                  {%- if settings.predictive_search_enabled -%}
+                    <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+                      <div class="predictive-search__loading-state">
+                        <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                          <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                        </svg>
+                      </div>
+                    </div>
+                    <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+                  {%- endif -%}
+                </form>
+                {%- if settings.predictive_search_enabled -%}
+                  </predictive-search>
+                {%- endif -%}
+              </div>
+
+
+              {% comment %} <details-modal class="header__search">
+                <details>
+                  <summary class="header__icon header__icon--search header__icon--summary link focus-inset modal__toggle" aria-haspopup="dialog" aria-label="{{ 'general.search.search' | t }}">
+                    <span>
+                      <svg class="modal__toggle-open icon icon-search" aria-hidden="true" focusable="false" role="presentation">
+                        <use href="#icon-search">
+                      </svg>
+                      <svg class="modal__toggle-close icon icon-close" aria-hidden="true" focusable="false" role="presentation">
+                        <use href="#icon-close">
+                      </svg>
+                    </span>
+                    <button><i class="fas fa-search"></i></button>
+                  </summary>
+                  <div class="search-modal modal__content" role="dialog" aria-modal="true" aria-label="{{ 'general.search.search' | t }}">
+                    <div class="modal-overlay"></div>
+                    <div class="search-modal__content" tabindex="-1">
+                      {%- if settings.predictive_search_enabled -%}
+                        <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+                      {%- endif -%}
+                        <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+                          <div class="field">
+                            <input class="search__input field__input"
+                              id="Search-In-Modal"
+                              type="search"
+                              name="q"
+                              value=""
+                              placeholder="{{ 'general.search.search' | t }}"
+                              {%- if settings.predictive_search_enabled -%}
+                                role="combobox"
+                                aria-expanded="false"
+                                aria-owns="predictive-search-results-list"
+                                aria-controls="predictive-search-results-list"
+                                aria-haspopup="listbox"
+                                aria-autocomplete="list"
+                                autocorrect="off"
+                                autocomplete="off"
+                                autocapitalize="off"
+                                spellcheck="false"
+                              {%- endif -%}
+                            >
+                            <label class="field__label" for="Search-In-Modal">{{ 'general.search.search' | t }}</label>
+                            <input type="hidden" name="options[prefix]" value="last">
+                            <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+                              <svg class="icon icon-search" aria-hidden="true" focusable="false" role="presentation">
+                                <use href="#icon-search">
+                              </svg>
+                            </button>
+                          </div>
+        
+                          {%- if settings.predictive_search_enabled -%}
+                            <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+                              <div class="predictive-search__loading-state">
+                                <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                  <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                                </svg>
+                              </div>
+                            </div>
+        
+                            <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+                          {%- endif -%}
+                        </form>
+                      {%- if settings.predictive_search_enabled -%}
+                        </predictive-search>
+                      {%- endif -%}
+                      <button type="button" class="search-modal__close-button modal__close-button link link--text focus-inset" aria-label="{{ 'accessibility.close' | t }}">
+                        <svg class="icon icon-close" aria-hidden="true" focusable="false" role="presentation">
+                          <use href="#icon-close">
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </details>
+              </details-modal> {% endcomment %}
+
+              {%- if shop.customer_accounts_enabled -%}
+                  <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="header__icon header__icon--account link focus-inset{% if section.settings.menu != blank %} small-hide{% endif %}">
+                    {% render 'icon-account' %}
+                    <span class="visually-hidden">
+                      {%- liquid
+                        if customer
+                          echo 'customer.account_fallback' | t
+                        else
+                          echo 'customer.log_in' | t
+                        endif
+                      -%}
+                    </span>
+                  </a>
+              {%- endif -%}
+            
+              <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
+                  {%- liquid
+                    if cart == empty
+                      render 'icon-cart-empty'
+                    else
+                      render 'icon-cart'
+                    endif
+                  -%}
+                  <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+                  {%- if cart != empty -%}
+                    <div class="cart-count-bubble">
+                      {%- if cart.item_count < 100 -%}
+                        <span aria-hidden="true">{{ cart.item_count }}</span>
+                      {%- endif -%}
+                      <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+                    </div>
+                  {%- endif -%}
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+</header>
+
+
+
+
+{% schema %}
+    {
+        "name": "BT Header",
+        "settings": [
+            {
+                "type": "image_picker",
+                "id": "logo",
+                "label": "Site Logo"
+            },
+            {
+              "type": "range",
+              "id": "logo_width",
+              "min": 50,
+              "max": 250,
+              "step": 10,
+              "default": 100,
+              "unit": "t:sections.header.settings.logo_width.unit",
+              "label": "Logo Width"
+            },
+            {
+              "type": "select",
+              "id": "logo_position",
+              "options": [
+                {
+                  "value": "middle-left",
+                  "label": "t:sections.header.settings.logo_position.options__1.label"
+                },
+                {
+                  "value": "top-left",
+                  "label": "t:sections.header.settings.logo_position.options__2.label"
+                },
+                {
+                  "value": "top-center",
+                  "label": "t:sections.header.settings.logo_position.options__3.label"
+                }
+              ],
+              "default": "middle-left",
+              "label": "Logo Position"
+            },
+            {
+              "type": "select",
+              "id": "menu_position",
+              "options": [
+                {
+                  "value": "me",
+                  "label": "t:sections.header.settings.menu_position.options__1.label"
+                },
+                {
+                  "value": "mx",
+                  "label": "t:sections.header.settings.menu_position.options__2.label"
+                },
+                {
+                  "value": "ms",
+                  "label": "t:sections.header.settings.menu_position.options__3.label"
+                }
+              ],
+              "default": "mx",
+              "label": "t:sections.header.settings.menu_position.label"
+            },
+            {
+              "type": "link_list",
+              "id": "menu",
+              "default": "main-menu",
+              "label": "Menu"
+            },
+            {
+              "type": "checkbox",
+              "id": "enable_sticky_header",
+              "default": true,
+              "label": "Enable Sticky Header",
+              "info": "Header shows on the screen as customers scroll up."
+            }
+        ]
+    }
+{% endschema %}

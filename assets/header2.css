@@ -1,0 +1,46 @@
+.sub-dropdown-menu {
+    display: none;
+}
+
+.active_nav .sub-dropdown-menu {
+    display: block;
+}
+
+.search-icon .icon, .cancel-icon .icon{
+    height: 1.8rem;
+    width: 1.8rem;
+    fill: none;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.cancel-icon, .search-icon.hide {
+    display: none;
+}
+
+.cancel-icon:hover .icon, .search-icon:hover .icon {
+    transform: scale(1.07);
+}
+
+.cancel-icon.show {
+    display: block;
+}
+
+.form-wrapper {
+    position: absolute;
+    top: 30px;
+    right: 180px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out, top 0.3s ease-in-out;
+}
+
+.search__input.field__input {
+    background-color: #ddd;
+}
+
+.form-wrapper.active {
+    opacity: 1;
+    top: 50px;
+    z-index: 3;
+}
